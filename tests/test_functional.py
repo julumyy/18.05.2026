@@ -1,5 +1,7 @@
+from src import manager
 from src.models import Bill, Parameters, TenantSettlement, ApartmentSettlement, Transfer
 from src.manager import Manager
+import json
 
 
 def test_settlement_due_between_tanants_and_apartment():
@@ -85,3 +87,15 @@ def test_apartment_has_any_bills():
 
     has_bills = manager.has_any_bills('apart-polanka', 2025, 3)
     assert has_bills == False
+
+def test_tych_klientow_nie_obslugujemy():
+    manager = Manager(Parameters())
+
+    assert manager.is_tenant_blacklisted("Józef Podgórski") == True
+
+    assert manager.is_tenant_blacklisted("Jan Kowalski") == False
+
+    print("All tests passed!")
+
+if __name__ == "__main__":
+    test_tych_klientow_nie_obslugujemy()

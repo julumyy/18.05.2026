@@ -1,3 +1,5 @@
+import json
+
 from src.models import Apartment, Bill, Parameters, Tenant, TenantSettlement, Transfer, ApartmentSettlement
 from typing import List, Tuple
 
@@ -114,3 +116,11 @@ class Manager:
         if apartment_key not in self.apartments:
             raise ValueError("Apartment key does not exist")
         return any([bill for bill in self.bills if bill.apartment == apartment_key and bill.settlement_year == year and bill.settlement_month == month])
+    
+    def is_tenant_blacklisted(self, tenant_name: str) -> bool:
+        with open('data/tych_klientow_nie_obslugujemy.json', 'r', encoding='utf-8') as f:
+            dane = json.load(f)
+
+        tekst_pliku = json.dumps(dane, ensure_ascii=False)
+
+        return tenant_name in tekst_pliku
