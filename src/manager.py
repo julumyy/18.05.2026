@@ -42,6 +42,13 @@ class Manager:
                 total_cost += bill.amount_pln
         return total_cost
 
+
+
+
+
+
+
+
     def get_settlement(self, apartment_key: str, year: int, month: int) -> ApartmentSettlement | None:
         if month < 1 or month > 12:
             raise ValueError("Month must be between 1 and 12")
@@ -70,7 +77,30 @@ class Manager:
         
         return [
             TenantSettlement(
-                tenant=tenant.name,
+                tenant=tenant.na     def validate_transfer_amount(self, transfer: Transfer) -> bool:    
+            return self.min_transfer_amount <= transfer.amount <= self.max_transfer_amount
+
+
+        def set_transfer_limit(self, min_amount: float, max_amount: float) -> None:
+        
+            if min_amount < 0 or max_amount < 0:
+                raise ValueError("Minimalna i maksymalna kwota nie mogą być ujemne.")
+            if min_amount > max_amount:
+                raise ValueError("Minimalna kwota nie może być większa od maksymalnej.")
+            self.min_transfer_amount = min_amount
+            self.max_transfer_amount = max_amount
+
+        def get_zly_transfer(self) -> List[Transfer]:
+            
+            return [
+                transfer
+                for transfer in self.transfers
+                if not self.validate_transfer_amount(transfer)
+            ]
+
+
+
+me,
                 apartment_settlement=apartment_settlement.key,
                 month=apartment_settlement.month,
                 year=apartment_settlement.year,
@@ -124,3 +154,29 @@ class Manager:
         tekst_pliku = json.dumps(dane, ensure_ascii=False)
 
         return tenant_name in tekst_pliku
+
+    def walidacja (self, transfer: Transfer) -> bool:
+        def validate_transfer_amount(self, transfer: Transfer) -> bool:    
+            return self.min_transfer_amount <= transfer.amount <= self.max_transfer_amount
+
+
+        def set_transfer_limit(self, min_amount: float, max_amount: float) -> None:
+        
+            if min_amount < 0 or max_amount < 0:
+                raise ValueError("Minimalna i maksymalna kwota nie mogą być ujemne.")
+            if min_amount > max_amount:
+                raise ValueError("Minimalna kwota nie może być większa od maksymalnej.")
+            self.min_transfer_amount = min_amount
+            self.max_transfer_amount = max_amount
+
+        def get_zly_transfer(self) -> List[Transfer]:
+            
+            return [
+                transfer
+                for transfer in self.transfers
+                if not self.validate_transfer_amount(transfer)
+            ]
+
+
+
+
