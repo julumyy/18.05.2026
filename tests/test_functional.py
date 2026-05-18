@@ -1,3 +1,5 @@
+import pytest
+
 from src import manager
 from src.models import Bill, Parameters, TenantSettlement, ApartmentSettlement, Transfer
 from src.manager import Manager
@@ -95,7 +97,62 @@ def test_tych_klientow_nie_obslugujemy():
 
     assert manager.is_tenant_blacklisted("Jan Kowalski") == False
 
-    print("All tests passed!")
+def test_ustawienia_limitow_przelewow():
+    manager = Manager(Parameters())
+    
+    manager.set_transfer_limit(100.0, 5000.0)
+
+    assert manager.min_transfer_amount == 100.0
+    assert manager.max_transfer_amount == 5000.0
+
+def test_blednych_limitow():
+    manager = Manager(Parameters())
+    
+    with pytest.raises(ValueError, match="Minimalna i maksymalna kwota nie mogą być ujemne."):
+        manager.set_transfer_limit(-10.0, 500.0)
+
+    with pytest.raises(ValueError, match="Minimalna kwota nie może być większa od maksymalnej."):
+        manager.set_transfer_limit(5000.0, 100.0)
+    
+def test_filtracja_zlych_przelewow():
+    manager = Manager(Parameters())
+    
+    manager.set_transfer_limit(50.0, 5000.0)
+
+    za_maly = Transfer(
+        amount_pln=30.0,
+        date='2025-01-01',
+        settlement_year=2025,
+        settlement_month=1,
+        tenant='tenant-1'
+)
+    za_duzy = Transfer(
+        amount_pln=6000.0,
+        date='2025-01-01',
+        settlement_year=2025,
+        settlement_month=1,
+        tenant='tenant-1'
+)
+    t_dobry = Transfer(
+        amount_pln=150.0,
+        date='2025-01-01',
+        settlement_year=2025,
+        settlement_month=1,
+        tenant='tenant-1'
+)
+
+
+    manager.add_transfer(za_maly)
+    manager.add_transfer(za_duzy)
+    manager.add_transfer(t_dobry)
+
+    zle = manager.get_zly_transfer()
+
+    assert len(zle) == 2
+    assert za_maly in zle
+    assert za_duzy in zle
+    assert t_dobry not in zle
 
 if __name__ == "__main__":
     test_tych_klientow_nie_obslugujemy()
+
